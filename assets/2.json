@@ -1,0 +1,19 @@
+{
+  "name": "Blue",
+  "symbol": "DISC",
+  "image": "2.png",
+  "properties": {
+    "files": [
+      {
+        "uri": "2.png",
+        "type": "image/png"
+      }
+    ],
+    "creators": [
+      {
+        "address": "6xRffq75o2JByAb4BwE7wcU4wNUS2oY63pLSZypYpdUp",
+        "share": 100
+      }
+    ]
+  }
+}

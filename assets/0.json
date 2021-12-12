@@ -1,0 +1,19 @@
+{
+  "name": "White",
+  "symbol": "DISC",
+  "image": "0.png",
+  "properties": {
+    "files": [
+      {
+        "uri": "0.png",
+        "type": "image/png"
+      }
+    ],
+    "creators": [
+      {
+        "address": "6xRffq75o2JByAb4BwE7wcU4wNUS2oY63pLSZypYpdUp",
+        "share": 100
+      }
+    ]
+  }
+}
