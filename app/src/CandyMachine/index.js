@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import { Connection, PublicKey } from '@solana/web3.js';
-import { Program, Provider, web3 } from '@project-serum/anchor';
-import { MintLayout, TOKEN_PROGRAM_ID, Token } from '@solana/spl-token';
-import { programs } from '@metaplex/js';
-import './CandyMachine.css';
+import React, { useEffect, useState } from "react";
+import { Connection, PublicKey } from "@solana/web3.js";
+import { Program, Provider, web3 } from "@project-serum/anchor";
+import { MintLayout, TOKEN_PROGRAM_ID, Token } from "@solana/spl-token";
+import { programs } from "@metaplex/js";
+import "./CandyMachine.css";
 import {
   candyMachineProgram,
   TOKEN_METADATA_PROGRAM_ID,
   SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID,
-} from './helpers';
-import { Loader } from '../Loader';
-import CountdownTimer from '../CountdownTimer'
+} from "./helpers";
+import { Loader } from "../Loader";
+import CountdownTimer from "../CountdownTimer";
 
 const {
   metadata: { Metadata, MetadataProgram },
@@ -19,7 +19,7 @@ const {
 const config = new web3.PublicKey(process.env.REACT_APP_CANDY_MACHINE_CONFIG);
 const { SystemProgram } = web3;
 const opts = {
-  preflightCommitment: 'processed',
+  preflightCommitment: "processed",
 };
 
 const MAX_NAME_LENGTH = 32;
@@ -27,12 +27,18 @@ const MAX_URI_LENGTH = 200;
 const MAX_SYMBOL_LENGTH = 10;
 const MAX_CREATOR_LEN = 32 + 1 + 1;
 
-const DropTimer = ({ machineStats }) => {
+const isUpcoming = (machineStats) => {
   const currentDate = new Date();
   const dropDate = new Date(machineStats.goLiveData * 1000);
 
-  if (currentDate < dropDate) {
-    console.log('Before drop date!');
+  return currentDate < dropDate;
+};
+
+const DropTimer = ({ machineStats }) => {
+  const dropDate = new Date(machineStats.goLiveData * 1000);
+
+  if (isUpcoming(machineStats)) {
+    console.log("Before drop date!");
     return <CountdownTimer dropDate={dropDate} />;
   }
 
@@ -51,6 +57,8 @@ const Mints = ({ mints }) => (
     </div>
   </div>
 );
+
+const SoldOut = () => <p>Sold Out 😭</p>;
 
 const CandyMachine = ({ walletAddress }) => {
   const [machineStats, setMachineStats] = useState(null);
@@ -109,7 +117,7 @@ const CandyMachine = ({ walletAddress }) => {
     return (
       await PublicKey.findProgramAddress(
         [
-          Buffer.from('metadata'),
+          Buffer.from("metadata"),
           TOKEN_METADATA_PROGRAM_ID.toBuffer(),
           mint.toBuffer(),
         ],
@@ -122,10 +130,10 @@ const CandyMachine = ({ walletAddress }) => {
     return (
       await PublicKey.findProgramAddress(
         [
-          Buffer.from('metadata'),
+          Buffer.from("metadata"),
           TOKEN_METADATA_PROGRAM_ID.toBuffer(),
           mint.toBuffer(),
-          Buffer.from('edition'),
+          Buffer.from("edition"),
         ],
         TOKEN_METADATA_PROGRAM_ID
       )
@@ -216,34 +224,34 @@ const CandyMachine = ({ walletAddress }) => {
         instructions,
       });
 
-      console.log('txn:', txn);
+      console.log("txn:", txn);
 
       // Setup listener
       connection.onSignatureWithOptions(
         txn,
         async (notification, context) => {
-          if (notification.type === 'status') {
-            console.log('Receievd status event');
+          if (notification.type === "status") {
+            console.log("Receievd status event");
 
             const { result } = notification;
             if (!result.err) {
-              console.log('NFT Minted!');
+              console.log("NFT Minted!");
 
               setIsMinting(false);
               await getCandyMachineState();
             }
           }
         },
-        { commitment: 'processed' }
+        { commitment: "processed" }
       );
     } catch (error) {
-      let message = error.msg || 'Minting failed! Please try again!';
+      let message = error.msg || "Minting failed! Please try again!";
 
       if (!error.msg) {
-        if (error.message.indexOf('0x138')) {
-        } else if (error.message.indexOf('0x137')) {
+        if (error.message.indexOf("0x138")) {
+        } else if (error.message.indexOf("0x137")) {
           message = `SOLD OUT!`;
-        } else if (error.message.indexOf('0x135')) {
+        } else if (error.message.indexOf("0x135")) {
           message = `Insufficient funds to mint. Please fund your wallet.`;
         }
       } else {
@@ -293,34 +301,34 @@ const CandyMachine = ({ walletAddress }) => {
     const rpcHost = process.env.REACT_APP_SOLANA_RPC_HOST;
     // Create a new connection object
     const connection = new Connection(rpcHost);
-    
+
     // Create a new Solana provider object
     const provider = new Provider(
       connection,
       window.solana,
       opts.preflightCommitment
     );
-  
+
     return provider;
   };
 
-  const getCandyMachineState = async () => { 
+  const getCandyMachineState = async () => {
     const provider = getProvider();
     const idl = await Program.fetchIdl(candyMachineProgram, provider);
     const program = new Program(idl, candyMachineProgram, provider);
     const candyMachine = await program.account.candyMachine.fetch(
       process.env.REACT_APP_CANDY_MACHINE_ID
     );
-    
+
     const itemsAvailable = candyMachine.data.itemsAvailable.toNumber();
     const itemsRedeemed = candyMachine.itemsRedeemed.toNumber();
     const itemsRemaining = itemsAvailable - itemsRedeemed;
     const goLiveData = candyMachine.data.goLiveDate.toNumber();
-  
+
     const goLiveDateTimeString = `${new Date(
       goLiveData * 1000
-    ).toDateString()}`
-  
+    ).toDateString()}`;
+
     // Add this data to your state to render
     setMachineStats({
       itemsAvailable,
@@ -329,7 +337,7 @@ const CandyMachine = ({ walletAddress }) => {
       goLiveData,
       goLiveDateTimeString,
     });
-  
+
     console.log({
       itemsAvailable,
       itemsRedeemed,
@@ -344,14 +352,14 @@ const CandyMachine = ({ walletAddress }) => {
       process.env.REACT_APP_CANDY_MACHINE_ID,
       true
     );
-    
+
     if (data.length !== 0) {
       for (const mint of data) {
         // Get URI
         const response = await fetch(mint.data.uri);
         const parse = await response.json();
         console.log("Past Minted NFT", mint);
-    
+
         // Get image URI
         if (!mints.find((mint) => mint === parse.image)) {
           setMints((prevState) => [...prevState, parse.image]);
@@ -366,18 +374,33 @@ const CandyMachine = ({ walletAddress }) => {
     getCandyMachineState();
   }, []);
 
+  const isSoldOut =
+    machineStats && machineStats.itemsRedeemed === machineStats.itemsAvailable;
+
   return (
     machineStats && (
       <div className="machine-container">
-        <DropTimer machineStats={machineStats} />
-        <p>{`Drop Date: ${machineStats.goLiveDateTimeString}`}</p>
-        <p>{`Items Minted: ${machineStats.itemsRedeemed} / ${machineStats.itemsAvailable}`}</p>
-        <button disabled={isMinting} className="cta-button mint-button" onClick={mintToken}>
-            Mint Disc NFT
-        </button>
-
-        {isLoadingMints && <Loader />}
-        {mints.length > 0 && <Mints mints={mints} />}
+        {isUpcoming(machineStats) ? (
+          <DropTimer machineStats={machineStats} />
+        ) : (
+          <>
+            <p>{`Drop Date: ${machineStats.goLiveDateTimeString}`}</p>
+            <p>{`Items Minted: ${machineStats.itemsRedeemed} / ${machineStats.itemsAvailable}`}</p>
+            {isSoldOut ? (
+              <SoldOut />
+            ) : (
+              <button
+                disabled={isMinting || isUpcoming(machineStats)}
+                className="cta-button mint-button"
+                onClick={mintToken}
+              >
+                Mint Disc NFT
+              </button>
+            )}
+            {isLoadingMints && <Loader />}
+            {mints.length > 0 && <Mints mints={mints} />}
+          </>
+        )}
       </div>
     )
   );
