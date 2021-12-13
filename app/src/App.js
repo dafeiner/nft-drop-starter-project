@@ -62,8 +62,8 @@ const App = () => {
     <div className="App">
       <div className="container">
         <div className="header-container">
-          <p className="header">🍭 Candy Drop</p>
-          <p className="sub-text">NFT drop machine with fair mint</p>
+          <p className="header">🥏 Disc Drop</p>
+          <p className="sub-text">Bang some cyber chains with fresh plastic</p>
           {!walletAddress && <NotConnected connectWallet={() => connectWallet({ setWalletAddress })} />}
         </div>
         <div className="footer-container">
