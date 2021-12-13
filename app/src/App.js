@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
 import twitterLogo from './assets/twitter-logo.svg';
+import CandyMachine from './CandyMachine';
 
 const TWITTER_HANDLE = '_buildspace';
 const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`;
@@ -65,6 +66,7 @@ const App = () => {
           <p className="header">🥏 Disc Drop</p>
           <p className="sub-text">Bang some cyber chains with fresh plastic</p>
           {!walletAddress && <NotConnected connectWallet={() => connectWallet({ setWalletAddress })} />}
+          {walletAddress && <CandyMachine walletAddress={window.solana} />}
         </div>
         <div className="footer-container">
           <img alt="Twitter Logo" className="twitter-logo" src={twitterLogo} />
